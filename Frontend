@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Air Quality Monitoring Assistant</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Smart Air Quality Monitoring & Sustainability Assistant</h1>
+
+    <input type="text" id="area" placeholder="Enter Area (e.g., Delhi)">
+    <input type="number" id="aqi" placeholder="Enter AQI value">
+
+    <select id="goal">
+        <option value="">Select Sustainability Goal</option>
+        <option value="exposure">Reduce Personal Exposure</option>
+        <option value="travel">Travel Sustainably</option>
+        <option value="community">Improve Local Air Quality</option>
+    </select>
+
+    <button onclick="checkAQI()">Check Air Quality</button>
+
+    <div class="result" id="result">
+        <h3 id="level"></h3>
+        <ul id="actions"></ul>
+        <p id="tip"></p>
+    </div>
+</div>
+
+<script>
+function checkAQI() {
+    const aqi = document.getElementById("aqi").value;
+    const goal = document.getElementById("goal").value;
+
+    fetch("/analyze", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({aqi: aqi, goal: goal})
+    })
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("result").style.display = "block";
+        document.getElementById("level").innerText =
+            "Air Quality Level: " + data.level;
+
+        const list = document.getElementById("actions");
+        list.innerHTML = "";
+        data.actions.forEach(a => {
+            const li = document.createElement("li");
+            li.innerText = "✔ " + a;
+            list.appendChild(li);
+        });
+
+        document.getElementById("tip").innerText =
+            "Sustainability Tip: " + data.tip;
+    });
+}
+</script>
+
+</body>
+</html>
