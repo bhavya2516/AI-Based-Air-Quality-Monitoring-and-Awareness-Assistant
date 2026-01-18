@@ -1,0 +1,58 @@
+from flask import Flask, render_template, request, jsonify
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return render_template("index.html")
+
+@app.route("/analyze", methods=["POST"])
+def analyze():
+    data = request.json
+    aqi = int(data["aqi"])
+    goal = data["goal"]
+
+    # AQI classification
+    if aqi <= 100:
+        level = "Moderate"
+    elif aqi <= 200:
+        level = "Poor"
+    elif aqi <= 300:
+        level = "Very Poor"
+    else:
+        level = "Severe"
+
+    # Goal-based recommendations
+    if goal == "exposure":
+        actions = [
+            "Avoid outdoor activities during peak hours",
+            "Wear N95 mask when going outside",
+            "Prefer indoor workouts",
+            "Use air purifier if available"
+        ]
+        tip = "Use public transport or carpool to reduce emissions."
+
+    elif goal == "travel":
+        actions = [
+            "Use public transport or metro",
+            "Avoid single-occupancy vehicles",
+            "Plan travel during low pollution hours"
+        ]
+        tip = "Reducing vehicle usage improves local air quality."
+
+    else:
+        actions = [
+            "Avoid burning waste",
+            "Reduce electricity consumption",
+            "Spread awareness about air pollution"
+        ]
+        tip = "Community efforts help reduce pollution levels."
+
+    return jsonify({
+        "level": level,
+        "actions": actions,
+        "tip": tip
+    })
+
+if __name__ == "__main__":
+    app.run(debug=True)
